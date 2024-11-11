@@ -48,7 +48,7 @@ module.exports.detail= async(req,res)=>{
     }
     
 };
-module.exports.editPatch= async(req,res)=>{
+module.exports.changeStatus= async(req,res)=>{
     try {
         await Task.updateOne({_id:req.params.id},{status:req.body.status});
     res.json({
@@ -61,4 +61,69 @@ module.exports.editPatch= async(req,res)=>{
             message:"Cap nhat khong thanh cong"
         })
     }
+}
+module.exports.changeMulti= async(req,res)=>{
+    try {
+        const ids= req.body.ids;
+    const key= req.body.key;
+    switch (key) {
+        case "status":
+            await Task.updateMany({_id:ids},{status:req.body.value})
+            res.json({
+                code:"200",
+                message:"Cap nhanh thanh cong"
+            });
+            break;
+        case "delete":
+            await Task.updateMany({_id:ids},{deleted:true})
+            res.json({
+                code:"200",
+                message:"Xoa thanh cong"
+            });
+        default:
+            break;
+    }
+    } catch (error) {
+        res.json({
+            code:"404",
+            message:"Cap nhanh khong thanh cong"
+        });
+    }
+}
+module.exports.create= async (req,res)=>{
+    try {
+        const task= new Task(req.body);
+    await task.save();
+    res.json({
+        code:"200",
+        message:"Tao thanh cong"
+    });
+    } catch (error) {
+        res.json({
+            code:"404",
+            message:"Tao khong thanh cong"
+        });
+    }
+}
+module.exports.edit= async (req,res)=>{
+    try {
+        const id= req.params.id;
+    await Task.updateOne({_id:id},req.body);
+    res.json({
+        code:"200",
+        message:"Cap nhat thanh cong"
+    })
+    } catch (error) {
+        res.json({
+            code:"404",
+            message:"Cap nhat khong thanh cong"
+        })
+    }
+}
+module.exports.delete= async(req,res)=>{
+    await Task.updateOne({_id:req.params.id},{deleted:true})
+    res.json({
+        code:"200",
+        message:"Xoa thanh cong"
+    })
 }
