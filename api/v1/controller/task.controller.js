@@ -5,6 +5,10 @@ const { model } = require("mongoose");
 module.exports.index= async(req,res)=>{
     try {
         const find={
+            $or:[
+                {create_user_id:req.user.id},
+                {participants:req.user.id}
+            ],
             deleted:false
         }
         const object=helperSearch(req.query);
@@ -33,6 +37,7 @@ module.exports.index= async(req,res)=>{
         const totalItem= await Task.countDocuments({deleted:false})
         objectPagination= helperPagination(objectPagination,req.query,totalItem);
         const tasks= await Task.find(find).skip(objectPagination.skipIndex).limit(objectPagination.limitItem).sort(sort)
+        // const tasks=await Task.find(find); 
         res.json(tasks);
     } catch (error) {
         res.json("Khong tim thay")
@@ -92,6 +97,7 @@ module.exports.changeMulti= async(req,res)=>{
 }
 module.exports.create= async (req,res)=>{
     try {
+        req.body.create_user_id=req.user.id;
         const task= new Task(req.body);
     await task.save();
     res.json({
